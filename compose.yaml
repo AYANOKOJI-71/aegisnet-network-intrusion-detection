@@ -1,0 +1,41 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: aegisnet
+      POSTGRES_USER: aegisnet
+      POSTGRES_PASSWORD: local-demo-only
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aegisnet -d aegisnet"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infra/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/api.Dockerfile
+    environment:
+      AEGISNET_STORE_MODE: postgres
+      AEGISNET_DATABASE_URL: postgresql://aegisnet:local-demo-only@postgres:5432/aegisnet
+      AEGISNET_ALLOWED_ORIGIN: http://localhost:8083
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "4500:4500"
+
+  web:
+    build:
+      context: .
+      dockerfile: docker/web.Dockerfile
+    depends_on:
+      - api
+    ports:
+      - "8083:80"
+
+volumes:
+  postgres_data:

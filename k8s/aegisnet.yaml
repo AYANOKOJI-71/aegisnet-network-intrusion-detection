@@ -1,0 +1,89 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aegisnet-api-config
+data:
+  AEGISNET_STORE_MODE: postgres
+  AEGISNET_ALLOWED_ORIGIN: https://security.example.invalid
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aegisnet-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: aegisnet-api
+  template:
+    metadata:
+      labels:
+        app: aegisnet-api
+    spec:
+      containers:
+        - name: api
+          image: ghcr.io/replace-me/aegisnet-api:latest
+          ports:
+            - containerPort: 4500
+          envFrom:
+            - configMapRef:
+                name: aegisnet-api-config
+          env:
+            - name: AEGISNET_DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: aegisnet-database
+                  key: url
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 4500
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aegisnet-api
+spec:
+  selector:
+    app: aegisnet-api
+  ports:
+    - port: 4500
+      targetPort: 4500
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aegisnet-web
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: aegisnet-web
+  template:
+    metadata:
+      labels:
+        app: aegisnet-web
+    spec:
+      containers:
+        - name: web
+          image: ghcr.io/replace-me/aegisnet-web:latest
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aegisnet-web
+spec:
+  selector:
+    app: aegisnet-web
+  ports:
+    - port: 80
+      targetPort: 80
