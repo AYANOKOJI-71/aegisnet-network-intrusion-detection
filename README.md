@@ -1,6 +1,6 @@
 # AegisNet — Network Intrusion Detection & Security Dashboard
 
-**A safe, explainable network-security operations lab built for cybersecurity and backend interviews.** AegisNet turns authorized metadata fixtures into transparent anomaly scores, analyst-controlled alerts, and an investigation-ready dashboard. It intentionally excludes live capture, scanning, traffic generation, packet injection, and external-target interaction.
+AegisNet turns authorized metadata fixtures into transparent anomaly scores, analyst-controlled alerts, and an investigation-ready dashboard. It intentionally excludes live capture, scanning, traffic generation, packet injection, and external-target interaction.
 
 ![License](https://img.shields.io/badge/license-MIT-75d6c0) ![Python](https://img.shields.io/badge/Python-3.12-60a6dd) ![FastAPI](https://img.shields.io/badge/FastAPI-0.115-58d7b3) ![React](https://img.shields.io/badge/React-18-63c6ea)
 
